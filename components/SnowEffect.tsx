@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
-export default function SnowEffect() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+const SnowEffect: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -10,41 +10,56 @@ export default function SnowEffect() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const snowflakes: { x: number; y: number; radius: number; speed: number }[] = [];
-    const numFlakes = 100;
-    const { innerWidth, innerHeight } = window;
+    const snowflakes: { x: number; y: number; speed: number }[] = [];
 
-    canvas.width = innerWidth;  // Ensure canvas width matches window width
-    canvas.height = innerHeight; // Ensure canvas height matches window height
-
-    // Initialize snowflakes with random positions and speeds
-    for (let i = 0; i < numFlakes; i++) {
+    // Create snowflakes
+    for (let i = 0; i < 100; i++) {
       snowflakes.push({
-        x: Math.random() * innerWidth,
-        y: Math.random() * innerHeight,
-        radius: Math.random() * 3 + 1,
-        speed: Math.random() * 2 + 0.5,
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        speed: Math.random() * 3 + 1,
       });
     }
 
+    // Update snowflakes on each animation frame
     function update() {
-      ctx.clearRect(0, 0, innerWidth, innerHeight);  // Clear previous frame
+      if (ctx) {
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight); // Clear previous frame
 
-      snowflakes.forEach((flake) => {
-        flake.y += flake.speed;
-        if (flake.y > innerHeight) flake.y = 0; // Reset snowflake to top if it falls off the bottom
-        ctx.beginPath();
-        ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
-        ctx.fillStyle = "white";
-        ctx.fill();
-      });
+        snowflakes.forEach((flake) => {
+          flake.y += flake.speed;
+          if (flake.y > window.innerHeight) {
+            flake.y = -10;
+            flake.x = Math.random() * window.innerWidth;
+          }
 
-      requestAnimationFrame(update);  // Keep animating the snowflakes
+          ctx.beginPath();
+          ctx.arc(flake.x, flake.y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = "white";
+          ctx.fill();
+        });
+      }
+
+      requestAnimationFrame(update);
     }
 
-    update();  // Start the animation loop
+    update(); // Start the animation
 
+    // Resize canvas on window resize
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
-  return <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full"></canvas>;
-}
+  return <canvas ref={canvasRef} style={{ position: "fixed", top: 0, left: 0, zIndex: -1 }} />;
+};
+
+export default SnowEffect;
