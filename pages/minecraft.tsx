@@ -1,36 +1,17 @@
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
-export default function Home() {
-  const [url, setUrl] = useState("");
-
-  useEffect(() => {
-    // Detect if the device is mobile
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    // Set the URL based on the device type
-    if (isMobile) {
-      setUrl("https://m.eaglercraft.com/mc/1.8.8/index.html"); // Replace with the mobile URL
-    } else {
-      setUrl("https://eaglercraft.com/mc/1.8.8/index.html"); // Replace with the desktop URL
-    }
-  }, []);
-
-  // Wait until the URL is determined
-  if (!url) {
-    return <div>Loading...</div>;
-  }
-
+export default function ComingSoon() {
   return (
-    <div style={{ height: "100vh", width: "100vw", margin: 0 }}>
-      <iframe
-        src={url}
-        style={{
-          width: "100%",
-          height: "100%",
-          border: "none",
-        }}
-        allowFullScreen
-      ></iframe>
+    <div id="center-text">
+      <h1 className="text-5xl font-festive mb-6">Coming soon 👀</h1>
+      <Link
+        href="/games/minecraft"
+        className="px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-100 transition"
+        style={{ marginRight: "16px" }}
+      >
+        Meant browser Minecraft?
+      </Link>
     </div>
   );
 }
